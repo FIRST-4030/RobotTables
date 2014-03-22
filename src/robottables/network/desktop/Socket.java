@@ -12,6 +12,7 @@ import java.util.HashSet;
 
 public class Socket {
 
+    private static final boolean IGNORE_LOCAL = true;
     private static final int MAX_MESSAGE_SIZE = 65535;
 
     private final DatagramSocket conn;
@@ -24,7 +25,9 @@ public class Socket {
         this.port = port;
         try {
             conn = new DatagramSocket(port);
-            getLocalAddrs();
+            if (IGNORE_LOCAL) {
+                getLocalAddrs();
+            }
         } catch (SocketException ex) {
             throw new IOException("Unable to initialize: " + ex.toString());
         }
