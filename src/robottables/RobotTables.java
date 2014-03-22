@@ -16,7 +16,8 @@ public class RobotTables implements IO.ListenEvents {
 
             int i = 0;
             while (true) {
-                io.send("FakeData-" + i);
+                Message msg = new Message(Message.Type.ACK, "TestTable", "SampleKey", String.valueOf(i));
+                io.send(msg.toString());
                 i++;
                 try {
                     Thread.sleep(1000);
@@ -30,7 +31,16 @@ public class RobotTables implements IO.ListenEvents {
 
     @Override
     public void recv(String data) {
-        System.out.println("Recv: " + data);
+        try {
+            Message msg = new Message(data);
+            System.out.println("Parsed Message: ");
+            System.out.println("\tType: " + msg.getType());
+            System.out.println("\tTable: " + msg.getTable());
+            System.out.println("\tKey: " + msg.getKey());
+            System.out.println("\tValue: " + msg.getValue());
+        } catch (IllegalArgumentException ex) {
+            System.err.println("Unable to parse message: " + ex.toString() + "\n\t" + data);
+        }
     }
 
     @Override
