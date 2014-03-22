@@ -84,6 +84,10 @@ public class Message {
         }
     }
 
+    public String displayStr() {
+        return "\tTable: " + getTable() + " [Type: " + getType() + "]\n" + "\t" + getKey() + " => " + getValue();
+    }
+
     public int getType() {
         return type;
     }
