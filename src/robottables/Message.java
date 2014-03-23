@@ -19,6 +19,8 @@ public class Message {
         public final static int LOWEST = QUERY;
     }
 
+    public final static char DELIMITER = '\0';
+
     private int type;
     private String table;
     private String key;
@@ -50,14 +52,14 @@ public class Message {
 
     @Override
     public String toString() {
-        return String.valueOf(type) + '\0' + table + '\0' + key + '\0' + value;
+        return String.valueOf(type) + DELIMITER + table + DELIMITER + key + DELIMITER + value;
     }
 
     private void parse(String raw) {
         // Parsing
-        int tableOffset = raw.indexOf('\0') + 1;
-        int keyOffset = raw.indexOf('\0', tableOffset) + 1;
-        int valueOffset = raw.indexOf('\0', keyOffset) + 1;
+        int tableOffset = raw.indexOf(DELIMITER) + 1;
+        int keyOffset = raw.indexOf(DELIMITER, tableOffset) + 1;
+        int valueOffset = raw.indexOf(DELIMITER, keyOffset) + 1;
         if (tableOffset <= 0 || keyOffset <= tableOffset || valueOffset <= keyOffset) {
             throw new IllegalArgumentException("Invalid message: Bad delimiter count");
         }
