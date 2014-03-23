@@ -2,41 +2,49 @@ package robottables.network;
 
 import robottables.network.desktop.Socket;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+import robottables.util.Platform;
 
 public class IO {
 
-    private static final boolean ON_ROBOT = false;
     private static final String addr = "255.255.255.255";
-    private static final int[] ports = new int[]{1130, 1140};
+    private static final String DRIVER_RECV = "DriverRecv";
+    private static final String ROBOT_SEND = DRIVER_RECV;
+    private static final int DRIVER_RECV_PORT = 1130;
+    private static final String ROBOT_RECV = "RobotRecv";
+    private static final String DRIVER_SEND = ROBOT_RECV;
+    private static final int ROBOT_RECV_PORT = 1140;
 
     private ListenEvents eventClass;
-    private final Socket[] sockets = new Socket[ports.length];
+    Map<String, Socket> sockets = new HashMap<>();
 
     public IO() throws IOException {
-        for (int i = 0; i < ports.length; i++) {
-            sockets[i] = new Socket(addr, ports[i]);
-        }
+        sockets.put(ROBOT_RECV, new Socket(addr, ROBOT_RECV_PORT));
+        sockets.put(DRIVER_RECV, new Socket(addr, DRIVER_RECV_PORT));
     }
 
     public void send(String data) throws IOException {
-        Socket socket = sockets[0];
-        if (ON_ROBOT) {
-            socket = sockets[1];
+        Socket socket;
+        if (Platform.onRobot()) {
+            socket = sockets.get(ROBOT_SEND);
+        } else {
+            socket = sockets.get(DRIVER_SEND);
         }
         socket.send(data);
     }
 
     public void listen(ListenEvents eventClass) {
         this.eventClass = eventClass;
-        for (int i = 0; i < ports.length; i++) {
-            (new Thread(new RecvThread(sockets[i]))).start();
+        for (Socket socket : sockets.values()) {
+            (new Thread(new RecvThread(socket))).start();
         }
     }
 
     public void close() {
         this.eventClass = null;
-        for (int i = 0; i < ports.length; i++) {
-            sockets[i].close();
+        for (Socket socket : sockets.values()) {
+            socket.close();
         }
     }
 

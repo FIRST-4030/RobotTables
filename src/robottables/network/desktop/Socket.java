@@ -32,6 +32,10 @@ public class Socket {
             throw new IOException("Unable to initialize: " + ex.toString());
         }
     }
+    
+    public int getPort() {
+        return port;
+    }
 
     /*
      * Load our list of all local IP addresses, sans the loopback and broadcast
