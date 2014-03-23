@@ -1,6 +1,5 @@
 package robottables;
 
-import java.util.Date;
 import robottables.Message.Type;
 import robottables.network.Queue;
 
@@ -45,7 +44,7 @@ public class Dispatch implements Runnable {
 
             // Dispatch if we have a handler
             if (handlers[msg.getType()] != null) {
-                timestamp = new Date().getTime();
+                timestamp = System.currentTimeMillis();
                 handlers[msg.getType()].dispatch(msg);
             } else {
                 System.err.println("Unhandled message:\n" + msg.displayStr());

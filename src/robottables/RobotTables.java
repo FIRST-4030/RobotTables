@@ -1,7 +1,6 @@
 package robottables;
 
 import java.io.IOException;
-import java.util.Date;
 import robottables.network.IO;
 import robottables.Dispatch.DistpachEvents;
 import robottables.network.Queue;
@@ -47,7 +46,7 @@ public class RobotTables implements DistpachEvents, QueueEvents {
         if (dispatch.currentMessage() == null) {
             System.err.println("\tNo dispatch handler running");
         } else {
-            long now = new Date().getTime();
+            long now = System.currentTimeMillis();
             System.err.println("\tDispatch time: " + (now - dispatch.dispatchTime()) + " ms ago");
             System.err.println("\tDispatch message:\n" + dispatch.currentMessage().displayStr());
         }
