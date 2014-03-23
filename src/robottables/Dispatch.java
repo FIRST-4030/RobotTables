@@ -15,14 +15,14 @@ public class Dispatch implements Runnable {
         setAllHandlers(null);
     }
 
-    public void setHandler(DistpachEvents handler, int type) {
+    public final void setHandler(DistpachEvents handler, int type) {
         if (type < Type.LOWEST || type > Type.HIGHEST) {
             throw new IllegalArgumentException("Invalid type: " + type);
         }
         handlers[type] = handler;
     }
 
-    public void setAllHandlers(DistpachEvents handler) {
+    public final void setAllHandlers(DistpachEvents handler) {
         for (int i = Type.LOWEST; i < Type.HIGHEST; i++) {
             setHandler(handler, i);
         }
