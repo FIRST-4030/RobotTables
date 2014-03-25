@@ -1,4 +1,4 @@
-package robottables.network.desktop;
+package org.ingrahamrobotics.robottables.network.desktop;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -18,7 +18,7 @@ public class Socket {
     private final DatagramSocket conn;
     private final InetAddress addr;
     private final int port;
-    private final HashSet<String> lAddrs = new HashSet<>();
+    private final HashSet<String> lAddrs = new HashSet<String>();
 
     public Socket(String addr, int port) throws IOException {
         this.addr = InetAddress.getByName(addr);

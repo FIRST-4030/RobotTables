@@ -1,7 +1,7 @@
-package robottables;
+package org.ingrahamrobotics.robottables;
 
-import robottables.Message.Type;
-import robottables.network.Queue;
+import org.ingrahamrobotics.robottables.Message.Type;
+import org.ingrahamrobotics.robottables.network.Queue;
 
 public class Dispatch implements Runnable {
 
@@ -36,7 +36,6 @@ public class Dispatch implements Runnable {
         return timestamp;
     }
 
-    @Override
     public void run() {
         while (true) {
             // Wait for the next message

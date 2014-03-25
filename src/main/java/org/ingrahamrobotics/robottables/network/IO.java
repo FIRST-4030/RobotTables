@@ -1,10 +1,10 @@
-package robottables.network;
+package org.ingrahamrobotics.robottables.network;
 
-import robottables.network.desktop.Socket;
+import org.ingrahamrobotics.robottables.network.desktop.Socket;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
-import robottables.util.Platform;
+import org.ingrahamrobotics.robottables.util.Platform;
 
 public class IO {
 
@@ -17,7 +17,7 @@ public class IO {
     private static final int ROBOT_RECV_PORT = 1140;
 
     private ListenEvents eventClass;
-    Map<String, Socket> sockets = new HashMap<>();
+    Map<String, Socket> sockets = new HashMap<String, Socket>();
 
     public IO() throws IOException {
         sockets.put(ROBOT_RECV, new Socket(addr, ROBOT_RECV_PORT));
@@ -56,7 +56,6 @@ public class IO {
             this.socket = socket;
         }
 
-        @Override
         public void run() {
             boolean done = false;
             while (!done) {

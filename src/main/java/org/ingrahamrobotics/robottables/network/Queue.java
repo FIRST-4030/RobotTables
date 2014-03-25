@@ -1,8 +1,8 @@
-package robottables.network;
+package org.ingrahamrobotics.robottables.network;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import robottables.Message;
+import org.ingrahamrobotics.robottables.Message;
 
 public class Queue implements IO.ListenEvents {
 
@@ -42,7 +42,6 @@ public class Queue implements IO.ListenEvents {
         return msg;
     }
 
-    @Override
     public void recv(String data) {
         try {
             Message msg = new Message(data);
@@ -52,7 +51,6 @@ public class Queue implements IO.ListenEvents {
         }
     }
 
-    @Override
     public void error(String err) {
         System.err.println("Err: " + err);
     }

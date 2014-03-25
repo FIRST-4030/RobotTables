@@ -1,4 +1,4 @@
-package robottables;
+package org.ingrahamrobotics.robottables;
 
 public class Message {
 
