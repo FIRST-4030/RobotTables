@@ -9,17 +9,15 @@ import org.ingrahamrobotics.robottables.network.Queue.QueueEvents;
 public class RobotTables implements DistpachEvents, QueueEvents {
 
     private Dispatch dispatch;
-
-    public static void main(String[] args) {
-        new RobotTables().run();
-    }
+    // Make IO a package-level variable (instead of a local variable) so that it is accessible from the outside
+    IO io;
 
     public void run() {
         // Message queue between listner and dispatch
         Queue queue = new Queue(this);
 
         try {
-            IO io = new IO();
+            io = new IO();
 
             // Listen for and queue incoming messages
             io.listen(queue);
@@ -28,9 +26,6 @@ public class RobotTables implements DistpachEvents, QueueEvents {
             dispatch = new Dispatch(queue);
             dispatch.setAllHandlers(this);
             (new Thread(dispatch)).start();
-
-            // Send fake data so we have something to work with in tests
-            (new Thread(new Sender(io))).start();
         } catch (IOException ex) {
             System.err.println(ex.toString());
         }
@@ -61,31 +56,5 @@ public class RobotTables implements DistpachEvents, QueueEvents {
 
         // Do something with the message
         System.out.println("Handled message:\n" + msg.displayStr());
-    }
-
-    private class Sender implements Runnable {
-
-        private final IO io;
-
-        public Sender(IO io) {
-            this.io = io;
-        }
-
-        public void run() {
-            int i = 0;
-            while (true) {
-                Message msg = new Message(Message.Type.ACK, "TestTable", "SampleKey", String.valueOf(i));
-                try {
-                    io.send(msg.toString());
-                } catch (IOException ex) {
-                    System.err.println(ex.toString());
-                }
-                i++;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                }
-            }
-        }
     }
 }
