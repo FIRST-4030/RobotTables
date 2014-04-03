@@ -1,16 +1,17 @@
 package org.ingrahamrobotics.robottables;
 
 import java.io.IOException;
-import org.ingrahamrobotics.robottables.Dispatch.DistpachEvents;
 import org.ingrahamrobotics.robottables.network.IO;
 import org.ingrahamrobotics.robottables.network.Queue;
 import org.ingrahamrobotics.robottables.network.Queue.QueueEvents;
 
-public class RobotTables implements DistpachEvents, QueueEvents {
+public class RobotTables implements QueueEvents {
 
-    private Dispatch dispatch;
     // Make IO a package-level variable (instead of a local variable) so that it is accessible from the outside
     IO io;
+    private Dispatch dispatch;
+    private ProtocolHandler protocolHandler;
+    private TablesInterfaceHandler tablesInterfaceHandler;
 
     public void run() {
         // Message queue between listner and dispatch
@@ -22,9 +23,18 @@ public class RobotTables implements DistpachEvents, QueueEvents {
             // Listen for and queue incoming messages
             io.listen(queue);
 
-            // Dispatch all messages from the queue to ourselves
             dispatch = new Dispatch(queue);
-            dispatch.setAllHandlers(this);
+
+            protocolHandler = new ProtocolHandler();
+
+            // Dispatch all messages from the queue to the protocol handler
+            dispatch.setAllHandlers(protocolHandler);
+
+            tablesInterfaceHandler = new TablesInterfaceHandler(protocolHandler);
+
+            // Set the interal handler on the protocol handler
+            protocolHandler.setInternalHandler(tablesInterfaceHandler);
+
             (new Thread(dispatch)).start();
         } catch (IOException ex) {
             System.err.println(ex.toString());
@@ -44,17 +54,5 @@ public class RobotTables implements DistpachEvents, QueueEvents {
             System.err.println("\tDispatch time: " + (now - dispatch.dispatchTime()) + " ms ago");
             System.err.println("\tDispatch message:\n" + dispatch.currentMessage().displayStr());
         }
-    }
-
-    public void dispatch(Message msg) {
-
-        // Sleep longer than the sender interval to induce a queue overload
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-        }
-
-        // Do something with the message
-        System.out.println("Handled message:\n" + msg.displayStr());
     }
 }

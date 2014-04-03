@@ -9,13 +9,19 @@ import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.listeners.ClientUpdateListener;
-import org.ingrahamrobotics.robottables.interfaces.InternalRobotTablesHandler;
+import org.ingrahamrobotics.robottables.interfaces.InternalTableHandler;
+import org.ingrahamrobotics.robottables.interfaces.RobotProtocol;
 
-public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotTablesHandler, Dispatch.DistpachEvents {
+public class TablesInterfaceHandler implements RobotTablesClient, InternalTableHandler {
 
-    private Hashtable tableMap = new Hashtable(); // Map from String to InternalTable
-    private List listeners = new ArrayList(); // List of ClientUpdateListener
-    private Timer tablePublishingTimer = new Timer();
+    private final Hashtable tableMap = new Hashtable(); // Map from String to InternalTable
+    private final List listeners = new ArrayList(); // List of ClientUpdateListener
+    private final Timer tablePublishingTimer = new Timer();
+    private final RobotProtocol protocolHandler;
+
+    public TablesInterfaceHandler(final RobotProtocol handler) {
+        protocolHandler = handler;
+    }
 
     public void externalPublishedTable(final String tableName) {
         InternalTable airTable = (InternalTable) tableMap.get(tableName);
@@ -61,13 +67,16 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
     }
 
     public void internalKeyUpdated(InternalTable table, String key, String newValue) {
-        sendKeyUpdate(table.getName(), key, newValue);
+        protocolHandler.sendKeyUpdate(table.getName(), key, newValue);
     }
 
     public void internalKeyRemoved(InternalTable table, String key) {
+        protocolHandler.sendKeyDelete(table.getName(), key);
     }
 
     public void internalTableCleared(InternalTable table) {
+        // Just trigger a full update - to show that all values have been removed - the values will have already been cleared
+        protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
     }
 
     void fireTableTypeChangeEvent(final RobotTable table, final TableType oldType, final TableType newType) {
@@ -96,7 +105,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
         InternalTable table = (InternalTable) tableMap.get(tableName);
         if (table == null) {
             // If we don't know about this table yet, publish it
-            sendPublishRequest(tableName);
+            protocolHandler.sendPublishRequest(tableName);
             table = new InternalTable(this, tableName, TableType.LOCAL);
             tablePublishingTimer.schedule(new TimerTask() {
                 @Override
@@ -123,23 +132,5 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
 
     public void removeClientListener(final ClientUpdateListener listener) {
         listeners.remove(listener);
-    }
-
-    // ********************** //
-    // *** Communications *** //
-    // ********************** //
-    private void sendPublishRequest(String tableName) {
-    }
-
-    private void sendFullUpdate(String tableName) {
-    }
-
-    private void sendKeyUpdate(String tableName, String keyName, String keyValue) {
-    }
-
-    private void sendKeyDelete(String tableName, String keyName) {
-    }
-
-    public void dispatch(final Message msg) {
     }
 }

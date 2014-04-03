@@ -22,7 +22,6 @@ public class Platform {
         } catch (ClassNotFoundException ex) {
             onRobot = true;
         }
-        System.out.println("Initiated onRobot=" + onRobot);
 //        // One of these (or a combination thereof) will let me figure out if we're running on the robot
 //        System.getProperty("java.version");
 //        System.getProperty("java.vendor");

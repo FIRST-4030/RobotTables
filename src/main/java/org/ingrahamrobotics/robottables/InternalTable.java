@@ -39,6 +39,10 @@ public class InternalTable implements RobotTable {
         return System.currentTimeMillis() - lastUpdate;
     }
 
+    public String getName() {
+        return name;
+    }
+
     void updatedNow() {
         lastUpdate = System.currentTimeMillis();
     }
@@ -213,8 +217,8 @@ public class InternalTable implements RobotTable {
     }
 
     /**
-     * Sets key to value, for internal use only. Doesn't call internal methods on the TablesInterfaceHandler.
-     * A null value will result in the key being removed
+     * Sets key to value, for internal use only. Doesn't call internal methods on the TablesInterfaceHandler. A null
+     * value will result in the key being removed
      */
     public void internalSet(final String key, final String value) {
         String oldValue = (String) valueMap.get(key);
@@ -241,6 +245,13 @@ public class InternalTable implements RobotTable {
         }
     }
 
+    /**
+     * Gets the internal value set, for internal use only.
+     */
+    public Hashtable getInternalValues() {
+        return valueMap;
+    }
+
     private void sendUpdateKeyEvent(final String key, final String value, final UpdateAction action) {
         for (int i = 0; i < listeners.size(); i++) {
             TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
@@ -253,9 +264,5 @@ public class InternalTable implements RobotTable {
             TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
             listener.onTableCleared(this);
         }
-    }
-
-    public String getName() {
-        return name;
     }
 }

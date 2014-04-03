@@ -2,7 +2,7 @@ package org.ingrahamrobotics.robottables.interfaces;
 
 import org.ingrahamrobotics.robottables.InternalTable;
 
-public interface InternalRobotTablesHandler {
+public interface InternalTableHandler {
 
     public void internalKeyUpdated(InternalTable table, String key, String newValue);
 
