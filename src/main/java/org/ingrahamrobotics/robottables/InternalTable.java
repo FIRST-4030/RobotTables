@@ -14,15 +14,17 @@ public class InternalTable implements RobotTable {
     private final Hashtable valueMap = new Hashtable(); // Map from String to String
     private final List listeners = new ArrayList(); // List of TableUpdateListener
     private TableType type;
+    private final String name;
     private long lastUpdate;
     /**
      * Whether this table is confirmed to be owned by us. This is only used internally.
      */
     private boolean readyToPublish;
 
-    public InternalTable(final TablesInterfaceHandler tables, final TableType initialType) {
+    public InternalTable(final TablesInterfaceHandler tables, final String name, final TableType initialType) {
         robotTables = tables;
         this.type = initialType;
+        this.name = name;
     }
 
     public TableType getType() {
@@ -251,5 +253,9 @@ public class InternalTable implements RobotTable {
             TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
             listener.onTableCleared(this);
         }
+    }
+
+    public String getName() {
+        return name;
     }
 }

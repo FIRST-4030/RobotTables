@@ -33,7 +33,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
             }
         } else {
             // If we don't know about this table, create a new one
-            airTable = new InternalTable(this, TableType.REMOTE);
+            airTable = new InternalTable(this, tableName, TableType.REMOTE);
             tableMap.put(tableName, airTable);
             fireNewTableEvent(airTable);
         }
@@ -61,6 +61,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
     }
 
     public void internalKeyUpdated(InternalTable table, String key, String newValue) {
+        sendKeyUpdate(table.getName(), key, newValue);
     }
 
     public void internalKeyRemoved(InternalTable table, String key) {
@@ -96,7 +97,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
         if (table == null) {
             // If we don't know about this table yet, publish it
             sendPublishRequest(tableName);
-            table = new InternalTable(this, TableType.LOCAL);
+            table = new InternalTable(this, tableName, TableType.LOCAL);
             tablePublishingTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -105,7 +106,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
                         table.setReadyToPublish(true);
                     }
                     if (table == null) {
-                        table = new InternalTable(TablesInterfaceHandler.this, TableType.LOCAL);
+                        table = new InternalTable(TablesInterfaceHandler.this, tableName, TableType.LOCAL);
                     }
                 }
             }, TimeConstants.PUBLISH_WAIT_TIME);
@@ -140,7 +141,5 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalRobotT
     }
 
     public void dispatch(final Message msg) {
-
-
     }
 }
