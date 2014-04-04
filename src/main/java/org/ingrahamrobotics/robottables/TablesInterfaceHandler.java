@@ -70,8 +70,16 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         protocolHandler.sendKeyUpdate(table.getName(), key, newValue);
     }
 
+    public void internalAdminKeyUpdated(InternalTable table, String key, String newValue) {
+        protocolHandler.sendAdminKeyUpdate(table.getName(), key, newValue);
+    }
+
     public void internalKeyRemoved(InternalTable table, String key) {
         protocolHandler.sendKeyDelete(table.getName(), key);
+    }
+
+    public void internalAdminKeyRemoved(InternalTable table, String key) {
+        protocolHandler.sendAdminKeyDelete(table.getName(), key);
     }
 
     public void internalTableCleared(InternalTable table) {

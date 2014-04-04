@@ -12,6 +12,7 @@ public class InternalTable implements RobotTable {
 
     private final TablesInterfaceHandler robotTables;
     private final Hashtable valueMap = new Hashtable(); // Map from String to String
+    private final Hashtable adminMap = new Hashtable(); // Map from String to String
     private final List listeners = new ArrayList(); // List of TableUpdateListener
     private TableType type;
     private final String name;
@@ -192,17 +193,49 @@ public class InternalTable implements RobotTable {
             if (oldValue != null) {
                 // If we do have a value, remove it
                 valueMap.remove(key);
+                sendUpdateEvent(key, null, UpdateAction.DELETE);
                 robotTables.internalKeyRemoved(this, key);
             }
         } else {
             if (oldValue == null || !value.equals(oldValue)) {
                 // If the value isn't there, or has changed.
                 valueMap.put(key, value);
-                sendUpdateKeyEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
+                sendUpdateEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
                 robotTables.internalKeyUpdated(this, key, value);
             }
         }
         return oldValue;
+    }
+
+    public String getAdmin(final String key) {
+        return (String) adminMap.get(key);
+    }
+
+    public String setAdmin(final String key, final String value) {
+        if (type != TableType.LOCAL) {
+            throw new IllegalStateException("TableType is not LOCAL");
+        }
+        String oldValue = (String) adminMap.get(key);
+        if (value == null) {
+            if (oldValue != null) {
+                // If we do have a value, remove it
+                adminMap.remove(key);
+                sendUpdateAdminEvent(key, null, UpdateAction.DELETE);
+                robotTables.internalAdminKeyRemoved(this, key);
+            }
+        } else {
+            if (oldValue == null || !value.equals(oldValue)) {
+                // If the value isn't there, or has changed.
+                adminMap.put(key, value);
+                sendUpdateAdminEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
+                robotTables.internalAdminKeyUpdated(this, key, value);
+            }
+        }
+        return oldValue;
+    }
+
+    public boolean containsAdmin(final String key) {
+        return adminMap.containsKey(key);
     }
 
     public void clear() {
@@ -225,12 +258,31 @@ public class InternalTable implements RobotTable {
         if (value == null) {
             if (oldValue != null) {
                 valueMap.remove(key);
-                sendUpdateKeyEvent(key, null, UpdateAction.DELETE);
+                sendUpdateEvent(key, null, UpdateAction.DELETE);
             }
         } else {
             if (oldValue == null || !value.equals(oldValue)) {
                 valueMap.put(key, value);
-                sendUpdateKeyEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
+                sendUpdateEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
+            }
+        }
+    }
+
+    /**
+     * Sets key to value in the admin namespace, for internal use only. Doesn't call internal methods on the
+     * TablesInterfaceHandler. A null value will result in the key being removed
+     */
+    public void internalSetAdmin(final String key, final String value) {
+        String oldValue = (String) valueMap.get(key);
+        if (value == null) {
+            if (oldValue != null) {
+                adminMap.remove(key);
+                sendUpdateAdminEvent(key, null, UpdateAction.DELETE);
+            }
+        } else {
+            if (oldValue == null || !value.equals(oldValue)) {
+                adminMap.put(key, value);
+                sendUpdateAdminEvent(key, value, (oldValue == null) ? UpdateAction.NEW : UpdateAction.UPDATE);
             }
         }
     }
@@ -252,10 +304,17 @@ public class InternalTable implements RobotTable {
         return valueMap;
     }
 
-    private void sendUpdateKeyEvent(final String key, final String value, final UpdateAction action) {
+    private void sendUpdateEvent(final String key, final String value, final UpdateAction action) {
         for (int i = 0; i < listeners.size(); i++) {
             TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
-            listener.onUpdateKey(this, key, value, action);
+            listener.onUpdate(this, key, value, action);
+        }
+    }
+
+    private void sendUpdateAdminEvent(final String key, final String value, final UpdateAction action) {
+        for (int i = 0; i < listeners.size(); i++) {
+            TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
+            listener.onUpdateAdmin(this, key, value, action);
         }
     }
 
