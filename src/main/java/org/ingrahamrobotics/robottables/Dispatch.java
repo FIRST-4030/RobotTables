@@ -56,6 +56,10 @@ public class Dispatch implements Runnable {
 
     public interface DistpachEvents {
 
+        /**
+         * Called when a message is recieved.
+         * @param msg
+         */
         public void dispatch(Message msg);
     }
 }
