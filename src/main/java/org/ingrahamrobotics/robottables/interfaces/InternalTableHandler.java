@@ -15,4 +15,8 @@ public interface InternalTableHandler {
     public void externalKeyUpdated(String tableName, String key, String newValue);
 
     public void externalKeyRemoved(String tableName, String key);
+
+    public void externalAdminKeyUpdated(String tableName, String key, String newValue);
+
+    public void externalAdminKeyRemoved(String tableName, String key, String newValue);
 }

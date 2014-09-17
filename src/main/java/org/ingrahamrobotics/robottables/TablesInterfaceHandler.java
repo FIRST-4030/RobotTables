@@ -16,8 +16,8 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
 
     private final Hashtable tableMap = new Hashtable(); // Map from String to InternalTable
     private final List listeners = new ArrayList(); // List of ClientUpdateListener
-    private final Timer tablePublishingTimer = new Timer();
     private final RobotProtocol protocolHandler;
+    private final Timer timer = new Timer();
 
     public TablesInterfaceHandler(final RobotProtocol handler) {
         protocolHandler = handler;
@@ -27,15 +27,18 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         InternalTable airTable = (InternalTable) tableMap.get(tableName);
 
         if (airTable != null) {
-            if (airTable.getType() != TableType.REMOTE) {
+            if (airTable.getType() == TableType.LOCAL) {
                 // If we are already publishing the table, clear all values, and change the type
                 airTable.internalClear();
                 TableType oldType = airTable.getType();
                 airTable.setType(TableType.REMOTE);
                 fireTableTypeChangeEvent(airTable, oldType, TableType.REMOTE);
-            } else if (airTable.getType() == TableType.REMOTE) {
-                airTable.internalClear(); // TODO: Should we clear all values when a already remote table is re-published?
+            } else {
+                airTable.internalClear();
+                // TODO: Should we clear all values when a already remote table is re-published?
                 // In fact, what does it even mean that an external table has been published when the table we know about is remote?
+                // Is this even a valid usage of externalPublishedTable?
+                // Should we just ignore this?
             }
         } else {
             // If we don't know about this table, create a new one
@@ -49,6 +52,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         // TODO:
         // Assuming that the other client is publishing when we recieve a message from them could lead
         // to a condition where both clients end up thinking that the other is publishing
+        // this will also need to be fixed in externalAdminKeyUpdated
         InternalTable table = (InternalTable) tableMap.get(tableName);
         if (table == null) {
             externalPublishedTable(tableName);
@@ -66,25 +70,53 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         }
     }
 
+    public void externalAdminKeyUpdated(final String tableName, final String key, final String newValue) {
+        InternalTable table = (InternalTable) tableMap.get(tableName);
+        if (table == null) {
+            externalPublishedTable(tableName);
+            table = (InternalTable) tableMap.get(tableName);
+        }
+        table.internalSetAdmin(key, newValue);
+    }
+
+    public void externalAdminKeyRemoved(final String tableName, final String key, final String newValue) {
+        InternalTable table = (InternalTable) tableMap.get(tableName);
+        if (table == null) {
+            externalPublishedTable(tableName);
+        } else { // We don't care about a key being removed for a table that we have no data on, so put it in an else statement
+            table.internalSetAdmin(key, null);
+        }
+    }
+
     public void internalKeyUpdated(InternalTable table, String key, String newValue) {
-        protocolHandler.sendKeyUpdate(table.getName(), key, newValue);
+        if (table.isReadyToPublish()) {
+            protocolHandler.sendKeyUpdate(table.getName(), key, newValue);
+        }
     }
 
     public void internalAdminKeyUpdated(InternalTable table, String key, String newValue) {
-        protocolHandler.sendAdminKeyUpdate(table.getName(), key, newValue);
+        if (table.isReadyToPublish()) {
+            protocolHandler.sendAdminKeyUpdate(table.getName(), key, newValue);
+        }
     }
 
     public void internalKeyRemoved(InternalTable table, String key) {
-        protocolHandler.sendKeyDelete(table.getName(), key);
+        if (table.isReadyToPublish()) {
+            protocolHandler.sendKeyDelete(table.getName(), key);
+        }
     }
 
     public void internalAdminKeyRemoved(InternalTable table, String key) {
-        protocolHandler.sendAdminKeyDelete(table.getName(), key);
+        if (table.isReadyToPublish()) {
+            protocolHandler.sendAdminKeyDelete(table.getName(), key);
+        }
     }
 
     public void internalTableCleared(InternalTable table) {
-        // Just trigger a full update - to show that all values have been removed - the values will have already been cleared
-        protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
+        if (table.isReadyToPublish()) {
+            // Just trigger a full update - to show that all values have been removed - the values will have already been cleared
+            protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
+        }
     }
 
     void fireTableTypeChangeEvent(final RobotTable table, final TableType oldType, final TableType newType) {
@@ -105,7 +137,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         return (InternalTable) tableMap.get(tableName);
     }
 
-    public boolean doesExist(final String tableName) {
+    public boolean exists(final String tableName) {
         return tableMap.containsKey(tableName);
     }
 
@@ -115,15 +147,15 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
             // If we don't know about this table yet, publish it
             protocolHandler.sendPublishRequest(tableName);
             table = new InternalTable(this, tableName, TableType.LOCAL);
-            tablePublishingTimer.schedule(new TimerTask() {
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     InternalTable table = (InternalTable) tableMap.get(tableName);
-                    if (table != null) {
-                        table.setReadyToPublish(true);
-                    }
                     if (table == null) {
-                        table = new InternalTable(TablesInterfaceHandler.this, tableName, TableType.LOCAL);
+                        System.err.println("Warning: Table '" + tableName + "' used to exist, but doesn't anymore.");
+                    } else {
+                        table.setReadyToPublish(true);
+                        protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
                     }
                 }
             }, TimeConstants.PUBLISH_WAIT_TIME);
