@@ -7,8 +7,9 @@ import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
+import org.ingrahamrobotics.robottables.interfaces.ProtocolTable;
 
-public class InternalTable implements RobotTable {
+public class InternalTable implements RobotTable, ProtocolTable {
 
     private final TablesInterfaceHandler robotTables;
     private final Hashtable valueMap = new Hashtable(); // Map from String to String
@@ -36,19 +37,23 @@ public class InternalTable implements RobotTable {
         this.type = type;
     }
 
-    public long getTimeSinceLastUpdate() {
-        return System.currentTimeMillis() - lastUpdate;
+    public long getLastUpdateTime() {
+        if (type == TableType.LOCAL) {
+            return System.currentTimeMillis();
+        } else {
+            return lastUpdate;
+        }
     }
 
     public String getName() {
         return name;
     }
 
-    void updatedNow() {
+    public void updatedNow() {
         lastUpdate = System.currentTimeMillis();
     }
 
-    void setReadyToPublish(final boolean readyToPublish) {
+    public void setReadyToPublish(final boolean readyToPublish) {
         this.readyToPublish = readyToPublish;
     }
 
