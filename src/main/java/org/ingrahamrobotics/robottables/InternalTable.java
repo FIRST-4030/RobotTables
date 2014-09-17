@@ -190,9 +190,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public String set(final String key, final String value) {
-        if (type != TableType.LOCAL) {
-            throw new IllegalStateException("TableType is not LOCAL");
-        }
+        ensureLocal();
         String oldValue = (String) valueMap.get(key);
         if (value == null) {
             if (oldValue != null) {
@@ -217,9 +215,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public String setAdmin(final String key, final String value) {
-        if (type != TableType.LOCAL) {
-            throw new IllegalStateException("TableType is not LOCAL");
-        }
+        ensureLocal();
         String oldValue = (String) adminMap.get(key);
         if (value == null) {
             if (oldValue != null) {
@@ -244,13 +240,17 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public void clear() {
-        if (type != TableType.LOCAL) {
-            throw new IllegalStateException("TableType is not LOCAL");
-        }
+        ensureLocal();
         if (!valueMap.isEmpty()) {
             valueMap.clear();
             robotTables.internalTableCleared(this);
             sendClearTableEvent();
+        }
+    }
+
+    private void ensureLocal() {
+        if (type != TableType.LOCAL) {
+            throw new IllegalStateException("Table is remote and unmodifiable");
         }
     }
 
