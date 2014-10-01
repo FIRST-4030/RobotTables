@@ -7,11 +7,12 @@ import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
+import org.ingrahamrobotics.robottables.interfaces.InternalTableHandler;
 import org.ingrahamrobotics.robottables.interfaces.ProtocolTable;
 
 public class InternalTable implements RobotTable, ProtocolTable {
 
-    private final TablesInterfaceHandler robotTables;
+    private final InternalTableHandler robotTables;
     private final Hashtable valueMap = new Hashtable(); // Map from String to String
     private final Hashtable adminMap = new Hashtable(); // Map from String to String
     private final List listeners = new ArrayList(); // List of TableUpdateListener
@@ -23,7 +24,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
      */
     private boolean readyToPublish;
 
-    public InternalTable(final TablesInterfaceHandler tables, final String name, final TableType initialType) {
+    public InternalTable(final InternalTableHandler tables, final String name, final TableType initialType) {
         robotTables = tables;
         this.type = initialType;
         this.name = name;

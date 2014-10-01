@@ -1,10 +1,9 @@
 package org.ingrahamrobotics.robottables.network;
 
-import org.ingrahamrobotics.robottables.network.desktop.Socket;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
-import org.ingrahamrobotics.robottables.util.Platform;
+import java.util.Map;
+import org.ingrahamrobotics.robottables.network.desktop.Socket;
 
 public class IO {
 
@@ -25,13 +24,11 @@ public class IO {
     }
 
     public void send(String data) throws IOException {
-        Socket socket;
-        if (Platform.onRobot()) {
-            socket = sockets.get(ROBOT_SEND);
-        } else {
-            socket = sockets.get(DRIVER_SEND);
+        for (Socket socket : sockets.values()) {
+            if (socket.isOpen()) {
+                socket.send(data);
+            }
         }
-        socket.send(data);
     }
 
     public void listen(ListenEvents eventClass) {

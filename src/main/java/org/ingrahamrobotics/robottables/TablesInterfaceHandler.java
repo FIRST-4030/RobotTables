@@ -34,7 +34,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
                 airTable.setType(TableType.REMOTE);
                 fireTableTypeChangeEvent(airTable, oldType, TableType.REMOTE);
             } else {
-                airTable.internalClear();
+                throw new IllegalStateException("externalPublishedTable called when external table already known");
                 // TODO: Should we clear all values when a already remote table is re-published?
                 // In fact, what does it even mean that an external table has been published when the table we know about is remote?
                 // Is this even a valid usage of externalPublishedTable?
@@ -79,7 +79,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         table.internalSetAdmin(key, newValue);
     }
 
-    public void externalAdminKeyRemoved(final String tableName, final String key, final String newValue) {
+    public void externalAdminKeyRemoved(final String tableName, final String key) {
         InternalTable table = (InternalTable) tableMap.get(tableName);
         if (table == null) {
             externalPublishedTable(tableName);
@@ -139,6 +139,11 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
 
     public boolean exists(final String tableName) {
         return tableMap.containsKey(tableName);
+    }
+
+    public TableType getTableType(final String tableName) {
+        InternalTable table = (InternalTable) tableMap.get(tableName);
+        return table == null ? null : table.getType();
     }
 
     public RobotTable publishTable(final String tableName) {

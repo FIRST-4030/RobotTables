@@ -2,6 +2,7 @@ package org.ingrahamrobotics.robottables;
 
 import java.io.IOException;
 import java.util.Hashtable;
+import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.interfaces.InternalTableHandler;
 import org.ingrahamrobotics.robottables.interfaces.RobotProtocol;
 import org.ingrahamrobotics.robottables.network.IO;
@@ -11,12 +12,12 @@ public class ProtocolHandler implements RobotProtocol {
     private InternalTableHandler handler;
     private final IO io;
 
-    public ProtocolHandler() throws IOException {
-        io = new IO();
+    public ProtocolHandler(IO io) throws IOException {
+        this.io = io;
     }
 
     public void sendPublishRequest(final String tableName) {
-        sendMessage(new Message(Message.Type.QUERY, tableName, "publish", "_"));
+        sendMessage(new Message(Message.Type.QUERY, tableName, "PUBLISH", "_"));
     }
 
     public void sendFullUpdate(final String tableName, final Hashtable tableValues) {
@@ -49,6 +50,52 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void dispatch(final Message msg) {
+        // Message received, perform action
+        TableType tableType = handler.getTableType(msg.getTable());
+        switch (msg.getType()) {
+            case Message.Type.QUERY:
+                boolean isPublish = msg.getKey().equals("PUBLISH");
+                if (!isPublish && !msg.getKey().equals("EXISTS")) {
+                    System.err.println("Invalid message received: " + msg.displayStr());
+                }
+                if (tableType == TableType.LOCAL) {
+                    sendMessage(new Message(isPublish ? Message.Type.NAK : Message.Type.ACK, msg.getTable(), msg.getKey(), msg.getValue()));
+                } else if (isPublish && tableType == null) {
+                    // Currently we won't send externalPublishedTable if we know the table is remote already,
+                    // perhaps we should change this? In the current setup, the table is only reset when the new
+                    // published sends the first full update.
+                    handler.externalPublishedTable(msg.getTable());
+                }
+                break;
+            case Message.Type.ACK:
+                if (msg.getKey().equals("GENERATION_COUNT") && tableType == TableType.LOCAL) {
+                    // TODO: Something should happen here
+                } else if (msg.getKey().equals("EXISTS")) {
+                    if (tableType == null) {
+                        handler.externalPublishedTable(msg.getTable()); // We didn't know this existed before, now we do.
+                    } else if (tableType == TableType.LOCAL) {
+                        // TODO: Something should happen here
+                    }
+                }
+                break;
+            case Message.Type.NAK:
+                if (tableType == TableType.LOCAL || tableType == null) {
+                    handler.externalPublishedTable(msg.getTable());
+                }
+                break;
+            case Message.Type.PUBLISH_ADMIN:
+                handler.externalAdminKeyUpdated(msg.getTable(), msg.getKey(), msg.getValue());
+                break;
+            case Message.Type.DELETE_ADMIN:
+                handler.externalAdminKeyRemoved(msg.getTable(), msg.getKey());
+                break;
+            case Message.Type.PUBLISH_USER:
+                handler.externalKeyUpdated(msg.getTable(), msg.getKey(), msg.getValue());
+                break;
+            case Message.Type.DELETE_USER:
+                handler.externalKeyRemoved(msg.getTable(), msg.getKey());
+                break;
+        }
         System.out.println("Received message:\n" + msg.displayStr());
     }
 

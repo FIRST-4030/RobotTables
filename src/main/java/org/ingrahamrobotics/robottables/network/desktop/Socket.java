@@ -1,8 +1,8 @@
 package org.ingrahamrobotics.robottables.network.desktop;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -32,7 +32,7 @@ public class Socket {
             throw new IOException("Unable to initialize: " + ex.toString());
         }
     }
-    
+
     public int getPort() {
         return port;
     }

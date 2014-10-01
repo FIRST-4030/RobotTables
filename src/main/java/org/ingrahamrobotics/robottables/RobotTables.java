@@ -1,6 +1,7 @@
 package org.ingrahamrobotics.robottables;
 
 import java.io.IOException;
+import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.network.IO;
 import org.ingrahamrobotics.robottables.network.Queue;
 import org.ingrahamrobotics.robottables.network.Queue.QueueEvents;
@@ -25,7 +26,7 @@ public class RobotTables implements QueueEvents {
 
             dispatch = new Dispatch(queue);
 
-            protocolHandler = new ProtocolHandler();
+            protocolHandler = new ProtocolHandler(io);
 
             // Dispatch all messages from the queue to the protocol handler
             dispatch.setAllHandlers(protocolHandler);
@@ -37,7 +38,7 @@ public class RobotTables implements QueueEvents {
 
             (new Thread(dispatch)).start();
         } catch (IOException ex) {
-            System.err.println(ex.toString());
+            ex.printStackTrace();
         }
     }
 
@@ -54,5 +55,13 @@ public class RobotTables implements QueueEvents {
             System.err.println("\tDispatch time: " + (now - dispatch.dispatchTime()) + " ms ago");
             System.err.println("\tDispatch message:\n" + dispatch.currentMessage().displayStr());
         }
+    }
+
+    public RobotTablesClient getClientInterface() {
+        return tablesInterfaceHandler;
+    }
+
+    public void close() {
+        io.close();
     }
 }

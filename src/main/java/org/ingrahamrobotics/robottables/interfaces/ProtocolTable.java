@@ -1,6 +1,8 @@
 package org.ingrahamrobotics.robottables.interfaces;
 
-public interface ProtocolTable {
+import org.ingrahamrobotics.robottables.api.RobotTable;
+
+public interface ProtocolTable extends RobotTable {
 
     public void setReadyToPublish(boolean readyToPublish);
 
