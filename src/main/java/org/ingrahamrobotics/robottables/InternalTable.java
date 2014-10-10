@@ -122,20 +122,12 @@ public class InternalTable implements RobotTable, ProtocolTable {
 
     public boolean getBoolean(final String key) {
         String str = (String) valueMap.get(key);
-        try {
-            return Boolean.parseBoolean(str);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
+        return ((str != null) && str.equalsIgnoreCase("true"));
     }
 
     public boolean getBoolean(final String key, final boolean defaultValue) {
         String str = (String) valueMap.get(key);
-        try {
-            return Boolean.parseBoolean(str);
-        } catch (NumberFormatException ex) {
-            return defaultValue;
-        }
+        return (str != null) ? str.equalsIgnoreCase("true") : defaultValue;
     }
 
     public long getLong(final String key) {
@@ -182,12 +174,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
 
     public boolean isBoolean(final String key) {
         String str = (String) valueMap.get(key);
-        try {
-            Boolean.parseBoolean(str);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
+        return str != null && str.equals("true") || str.equals("false");
     }
 
     public String set(final String key, final String value) {
