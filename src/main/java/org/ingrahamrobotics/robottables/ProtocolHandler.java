@@ -41,6 +41,8 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendMessage(final Message message) {
+        System.out.println("[Raw] Sending: " + message.toString().replace("\0", "\\0"));
+        System.out.println("Sending:\n" + message.displayStr());
         try {
             io.send(message.toString());
         } catch (IOException e) {
@@ -96,7 +98,8 @@ public class ProtocolHandler implements RobotProtocol {
                 handler.externalKeyRemoved(msg.getTable(), msg.getKey());
                 break;
         }
-        System.out.println("Received message:\n" + msg.displayStr());
+        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
+        System.out.println("Received:\n" + msg.displayStr());
     }
 
     public void setInternalHandler(final InternalTableHandler handler) {
