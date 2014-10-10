@@ -24,6 +24,7 @@ public class IO {
     }
 
     public void send(String data) throws IOException {
+        // Push on all sockets, so other driver stations can recieve as well as the robot.
         for (Socket socket : sockets.values()) {
             if (socket.isOpen()) {
                 socket.send(data);
