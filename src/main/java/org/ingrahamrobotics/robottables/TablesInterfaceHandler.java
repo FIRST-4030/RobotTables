@@ -152,6 +152,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
             // If we don't know about this table yet, publish it
             protocolHandler.sendPublishRequest(tableName);
             table = new InternalTable(this, tableName, TableType.LOCAL);
+            tableMap.put(tableName, table);
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
