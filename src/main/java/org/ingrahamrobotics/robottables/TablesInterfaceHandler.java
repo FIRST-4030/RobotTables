@@ -1,8 +1,9 @@
 package org.ingrahamrobotics.robottables;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.ingrahamrobotics.robottables.api.RobotTable;
@@ -14,8 +15,8 @@ import org.ingrahamrobotics.robottables.interfaces.RobotProtocol;
 
 public class TablesInterfaceHandler implements RobotTablesClient, InternalTableHandler {
 
-    private final Hashtable tableMap = new Hashtable(); // Map from String to InternalTable
-    private final List listeners = new ArrayList(); // List of ClientUpdateListener
+    private final Map<String, InternalTable> tableMap = new HashMap<String, InternalTable>(); // Map from String to InternalTable
+    private final List<ClientUpdateListener> listeners = new ArrayList<ClientUpdateListener>(); // List of ClientUpdateListener
     private final RobotProtocol protocolHandler;
     private final Timer timer = new Timer();
 
@@ -24,7 +25,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     }
 
     public void externalPublishedTable(final String tableName) {
-        InternalTable airTable = (InternalTable) tableMap.get(tableName);
+        InternalTable airTable = tableMap.get(tableName);
 
         if (airTable != null) {
             if (airTable.getType() == TableType.LOCAL) {
@@ -62,7 +63,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     }
 
     public void externalKeyRemoved(final String tableName, final String key) {
-        InternalTable table = (InternalTable) tableMap.get(tableName);
+        InternalTable table = tableMap.get(tableName);
         if (table == null) {
             externalPublishedTable(tableName);
         } else { // We don't care about a key being removed for a table that we have no data on, so put it in an else statement
@@ -71,16 +72,16 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     }
 
     public void externalAdminKeyUpdated(final String tableName, final String key, final String newValue) {
-        InternalTable table = (InternalTable) tableMap.get(tableName);
+        InternalTable table = tableMap.get(tableName);
         if (table == null) {
             externalPublishedTable(tableName);
-            table = (InternalTable) tableMap.get(tableName);
+            table = tableMap.get(tableName);
         }
         table.internalSetAdmin(key, newValue);
     }
 
     public void externalAdminKeyRemoved(final String tableName, final String key) {
-        InternalTable table = (InternalTable) tableMap.get(tableName);
+        InternalTable table = tableMap.get(tableName);
         if (table == null) {
             externalPublishedTable(tableName);
         } else { // We don't care about a key being removed for a table that we have no data on, so put it in an else statement
@@ -120,21 +121,19 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     }
 
     void fireTableTypeChangeEvent(final RobotTable table, final TableType oldType, final TableType newType) {
-        for (int i = 0; i < listeners.size(); i++) {
-            final ClientUpdateListener listener = (ClientUpdateListener) listeners.get(i);
+        for (final ClientUpdateListener listener : listeners) {
             listener.onTableChangeType(table, oldType, newType);
         }
     }
 
     void fireNewTableEvent(final RobotTable table) {
-        for (int i = 0; i < listeners.size(); i++) {
-            final ClientUpdateListener listener = (ClientUpdateListener) listeners.get(i);
+        for (final ClientUpdateListener listener : listeners) {
             listener.onNewTable(table);
         }
     }
 
     public RobotTable getTable(final String tableName) {
-        return (InternalTable) tableMap.get(tableName);
+        return tableMap.get(tableName);
     }
 
     public boolean exists(final String tableName) {
@@ -142,12 +141,12 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     }
 
     public TableType getTableType(final String tableName) {
-        InternalTable table = (InternalTable) tableMap.get(tableName);
+        InternalTable table = tableMap.get(tableName);
         return table == null ? null : table.getType();
     }
 
     public RobotTable publishTable(final String tableName) {
-        InternalTable table = (InternalTable) tableMap.get(tableName);
+        InternalTable table = tableMap.get(tableName);
         if (table == null) {
             // If we don't know about this table yet, publish it
             protocolHandler.sendPublishRequest(tableName);
@@ -156,7 +155,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    InternalTable table = (InternalTable) tableMap.get(tableName);
+                    InternalTable table = tableMap.get(tableName);
                     if (table == null) {
                         System.err.println("Warning: Table '" + tableName + "' used to exist, but doesn't anymore.");
                     } else {

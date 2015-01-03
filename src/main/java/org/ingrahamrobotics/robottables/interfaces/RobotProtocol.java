@@ -1,13 +1,13 @@
 package org.ingrahamrobotics.robottables.interfaces;
 
-import java.util.Hashtable;
+import java.util.Map;
 import static org.ingrahamrobotics.robottables.Dispatch.DistpachEvents;
 
 public interface RobotProtocol extends DistpachEvents {
 
     public void sendPublishRequest(String tableName);
 
-    public void sendFullUpdate(String tableName, Hashtable tableValues);
+    public void sendFullUpdate(String tableName, Map<String, String> tableValues);
 
     public void sendKeyUpdate(String tableName, String key, String value);
 

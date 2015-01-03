@@ -58,7 +58,6 @@ public class Dispatch implements Runnable {
 
         /**
          * Called when a message is recieved.
-         * @param msg
          */
         public void dispatch(Message msg);
     }

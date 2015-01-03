@@ -1,8 +1,9 @@
 package org.ingrahamrobotics.robottables;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
@@ -13,9 +14,9 @@ import org.ingrahamrobotics.robottables.interfaces.ProtocolTable;
 public class InternalTable implements RobotTable, ProtocolTable {
 
     private final InternalTableHandler robotTables;
-    private final Hashtable valueMap = new Hashtable(); // Map from String to String
-    private final Hashtable adminMap = new Hashtable(); // Map from String to String
-    private final List listeners = new ArrayList(); // List of TableUpdateListener
+    private final Map<String, String> valueMap = new HashMap<String, String>(); // Map from String to String
+    private final Map<String, String> adminMap = new HashMap<String, String>(); // Map from String to String
+    private final List<TableUpdateListener> listeners = new ArrayList<TableUpdateListener>(); // List of TableUpdateListener
     private TableType type;
     private final String name;
     private long lastUpdate;
@@ -73,11 +74,11 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public String get(final String key) {
-        return (String) valueMap.get(key);
+        return valueMap.get(key);
     }
 
     public String get(final String key, final String defaultValue) {
-        String value = (String) valueMap.get(key);
+        String value = valueMap.get(key);
         if (value == null) {
             value = defaultValue;
         }
@@ -85,7 +86,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public int getInt(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Integer.parseInt(str);
         } catch (NumberFormatException ex) {
@@ -94,7 +95,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public int getInt(final String key, final int defaultValue) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Integer.parseInt(str);
         } catch (NumberFormatException ex) {
@@ -121,17 +122,17 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public boolean getBoolean(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         return ((str != null) && str.equalsIgnoreCase("true"));
     }
 
     public boolean getBoolean(final String key, final boolean defaultValue) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         return (str != null) ? str.equalsIgnoreCase("true") : defaultValue;
     }
 
     public long getLong(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Long.parseLong(str);
         } catch (NumberFormatException ex) {
@@ -140,7 +141,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public long getLong(final String key, final long defaultValue) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Long.parseLong(str);
         } catch (NumberFormatException ex) {
@@ -153,7 +154,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public boolean isInt(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             Integer.parseInt(str);
             return true;
@@ -163,7 +164,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public boolean isDouble(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             Double.parseDouble(str);
             return true;
@@ -173,13 +174,13 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public boolean isBoolean(final String key) {
-        String str = (String) valueMap.get(key);
-        return str != null && str.equals("true") || str.equals("false");
+        String str = valueMap.get(key);
+        return str != null && (str.equals("true") || str.equals("false"));
     }
 
     public String set(final String key, final String value) {
         ensureLocal();
-        String oldValue = (String) valueMap.get(key);
+        String oldValue = valueMap.get(key);
         if (value == null) {
             if (oldValue != null) {
                 // If we do have a value, remove it
@@ -199,12 +200,12 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public String getAdmin(final String key) {
-        return (String) adminMap.get(key);
+        return adminMap.get(key);
     }
 
     public String setAdmin(final String key, final String value) {
         ensureLocal();
-        String oldValue = (String) adminMap.get(key);
+        String oldValue = adminMap.get(key);
         if (value == null) {
             if (oldValue != null) {
                 // If we do have a value, remove it
@@ -247,7 +248,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
      * value will result in the key being removed
      */
     public void internalSet(final String key, final String value) {
-        String oldValue = (String) valueMap.get(key);
+        String oldValue = valueMap.get(key);
         if (value == null) {
             if (oldValue != null) {
                 valueMap.remove(key);
@@ -266,7 +267,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
      * TablesInterfaceHandler. A null value will result in the key being removed
      */
     public void internalSetAdmin(final String key, final String value) {
-        String oldValue = (String) valueMap.get(key);
+        String oldValue = valueMap.get(key);
         if (value == null) {
             if (oldValue != null) {
                 adminMap.remove(key);
@@ -293,27 +294,24 @@ public class InternalTable implements RobotTable, ProtocolTable {
     /**
      * Gets the internal value set, for internal use only.
      */
-    public Hashtable getInternalValues() {
+    public Map<String, String> getInternalValues() {
         return valueMap;
     }
 
     private void sendUpdateEvent(final String key, final String value, final UpdateAction action) {
-        for (int i = 0; i < listeners.size(); i++) {
-            TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
+        for (TableUpdateListener listener : listeners) {
             listener.onUpdate(this, key, value, action);
         }
     }
 
     private void sendUpdateAdminEvent(final String key, final String value, final UpdateAction action) {
-        for (int i = 0; i < listeners.size(); i++) {
-            TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
+        for (TableUpdateListener listener : listeners) {
             listener.onUpdateAdmin(this, key, value, action);
         }
     }
 
     private void sendClearTableEvent() {
-        for (int i = 0; i < listeners.size(); i++) {
-            TableUpdateListener listener = (TableUpdateListener) listeners.get(i);
+        for (TableUpdateListener listener : listeners) {
             listener.onTableCleared(this);
         }
     }

@@ -1,7 +1,7 @@
 package org.ingrahamrobotics.robottables;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.Map;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.interfaces.InternalTableHandler;
 import org.ingrahamrobotics.robottables.interfaces.RobotProtocol;
@@ -20,7 +20,7 @@ public class ProtocolHandler implements RobotProtocol {
         sendMessage(new Message(Message.Type.QUERY, tableName, "PUBLISH", "_"));
     }
 
-    public void sendFullUpdate(final String tableName, final Hashtable tableValues) {
+    public void sendFullUpdate(final String tableName, final Map<String, String> tableValues) {
 
     }
 
