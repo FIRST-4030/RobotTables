@@ -79,4 +79,27 @@
             </plugin>
         </plugins>
     </build>
+
+    <issueManagement>
+        <url>https://github.com/FIRST-4030/RobotTables/issues</url>
+        <system>Github Issues</system>
+    </issueManagement>
+    <ciManagement>
+        <system>teamcity</system>
+        <url>http://ci.dabo.guru/p/RobotTables</url>
+    </ciManagement>
+    <distributionManagement>
+        <repository>
+            <id>repo.dabo.guru</id>
+            <name>Release Repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>http://repo.dabo.guru/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo.dabo.guru</id>
+            <name>Snapshot Repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>http://repo.dabo.guru/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
