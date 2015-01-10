@@ -9,7 +9,7 @@ public class Queue implements IO.ListenEvents {
     private static final int QUEUE_SIZE = 100;
     private static final int QUEUE_WARN_SIZE = QUEUE_SIZE / 2;
 
-    private final BlockingQueue queue;
+    private final BlockingQueue<Message> queue;
     private final QueueEvents handler;
 
     public Queue(QueueEvents handler) {
@@ -35,7 +35,7 @@ public class Queue implements IO.ListenEvents {
         Message msg = null;
         while (msg == null) {
             try {
-                msg = (Message) queue.take();
+                msg = queue.take();
             } catch (InterruptedException ex) {
             }
         }
