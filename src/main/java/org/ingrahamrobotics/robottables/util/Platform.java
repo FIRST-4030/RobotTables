@@ -16,19 +16,13 @@ public class Platform {
     }
 
     private static void init() {
-        try {
-            Class.forName("java.util.ArrayList");
-            onRobot = false;
-        } catch (ClassNotFoundException ex) {
-            onRobot = true;
-        }
+        onRobot = false;
 //        // One of these (or a combination thereof) will let me figure out if we're running on the robot
 //        System.getProperty("java.version");
 //        System.getProperty("java.vendor");
 //        System.getProperty("java.compiler");
 //        System.getProperty("os.name");
 //        onRobot = false;
-
         ready = true;
     }
 }
