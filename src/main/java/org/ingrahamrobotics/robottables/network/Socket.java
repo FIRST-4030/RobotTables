@@ -1,4 +1,4 @@
-package org.ingrahamrobotics.robottables.network.desktop;
+package org.ingrahamrobotics.robottables.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
