@@ -4,14 +4,14 @@ import java.io.IOException;
 
 public class IO {
 
-    private static final String addr = "255.255.255.255";
     private static final int COMMUNICATIONS_PORT = 5805;
 
     private ListenEvents eventClass;
     private Socket socket;
 
-    public IO() throws IOException {
-        socket = new Socket(addr, COMMUNICATIONS_PORT);
+    public IO(String address) throws IOException {
+        socket = new Socket(address, COMMUNICATIONS_PORT);
+
     }
 
     public void send(String data) throws IOException {

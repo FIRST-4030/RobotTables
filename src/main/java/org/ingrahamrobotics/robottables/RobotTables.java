@@ -14,12 +14,12 @@ public class RobotTables implements QueueEvents {
     private ProtocolHandler protocolHandler;
     private TablesInterfaceHandler tablesInterfaceHandler;
 
-    public void run() {
+    public void run(String targetAddress) {
         // Message queue between listner and dispatch
         Queue queue = new Queue(this);
 
         try {
-            io = new IO();
+            io = new IO(targetAddress);
 
             // Listen for and queue incoming messages
             io.listen(queue);

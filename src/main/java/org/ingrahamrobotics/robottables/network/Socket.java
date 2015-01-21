@@ -25,6 +25,7 @@ public class Socket {
         this.port = port;
         try {
             conn = new DatagramSocket(port);
+            conn.setBroadcast(true);
             if (IGNORE_LOCAL) {
                 getLocalAddrs();
             }
