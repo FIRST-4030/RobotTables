@@ -15,7 +15,7 @@ public class RobotTables implements QueueEvents {
     private TablesInterfaceHandler tablesInterfaceHandler;
 
     public void run(String targetAddress) {
-        // Message queue between listner and dispatch
+        // Message queue between listener and dispatch
         Queue queue = new Queue(this);
 
         try {
@@ -33,7 +33,7 @@ public class RobotTables implements QueueEvents {
 
             tablesInterfaceHandler = new TablesInterfaceHandler(protocolHandler);
 
-            // Set the interal handler on the protocol handler
+            // Set the internal handler on the protocol handler
             protocolHandler.setInternalHandler(tablesInterfaceHandler);
 
             (new Thread(dispatch)).start();

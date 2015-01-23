@@ -14,7 +14,7 @@ public class Queue implements IO.ListenEvents {
 
     public Queue(QueueEvents handler) {
         this.handler = handler;
-        this.queue = new ArrayBlockingQueue(QUEUE_SIZE);
+        this.queue = new ArrayBlockingQueue<Message>(QUEUE_SIZE);
     }
 
     public void put(Message msg) {
