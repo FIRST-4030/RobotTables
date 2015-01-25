@@ -104,7 +104,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public double getDouble(final String key) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Double.parseDouble(str);
         } catch (NumberFormatException ex) {
@@ -113,7 +113,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     }
 
     public double getDouble(final String key, final double defaultValue) {
-        String str = (String) valueMap.get(key);
+        String str = valueMap.get(key);
         try {
             return Double.parseDouble(str);
         } catch (NumberFormatException ex) {
