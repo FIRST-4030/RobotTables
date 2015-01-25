@@ -116,7 +116,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     public void internalTableCleared(InternalTable table) {
         if (table.isReadyToPublish()) {
             // Just trigger a full update - to show that all values have been removed - the values will have already been cleared
-            protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
+            protocolHandler.sendFullUpdate(table);
         }
     }
 
@@ -160,7 +160,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
                         System.err.println("Warning: Table '" + tableName + "' used to exist, but doesn't anymore.");
                     } else {
                         table.setReadyToPublish(true);
-                        protocolHandler.sendFullUpdate(table.getName(), table.getInternalValues());
+                        protocolHandler.sendFullUpdate(table);
                     }
                 }
             }, TimeConstants.PUBLISH_WAIT_TIME);

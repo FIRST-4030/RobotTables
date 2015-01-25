@@ -7,7 +7,7 @@ public interface RobotProtocol extends DistpachEvents {
 
     public void sendPublishRequest(String tableName);
 
-    public void sendFullUpdate(String tableName, Map<String, String> tableValues);
+    public void sendFullUpdate(ProtocolTable table);
 
     public void sendKeyUpdate(String tableName, String key, String value);
 

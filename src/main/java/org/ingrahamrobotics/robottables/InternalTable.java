@@ -298,6 +298,14 @@ public class InternalTable implements RobotTable, ProtocolTable {
         return valueMap;
     }
 
+    public Map<String, String> getUserValues() {
+        return valueMap;
+    }
+
+    public Map<String, String> getAdminValues() {
+        return adminMap;
+    }
+
     private void sendUpdateEvent(final String key, final String value, final UpdateAction action) {
         for (TableUpdateListener listener : listeners) {
             listener.onUpdate(this, key, value, action);
