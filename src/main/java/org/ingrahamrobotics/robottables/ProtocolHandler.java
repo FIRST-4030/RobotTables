@@ -88,6 +88,8 @@ public class ProtocolHandler implements RobotProtocol {
     public void dispatch(final Message msg) {
         // Message received, perform action
         TableType tableType = handler.getTableType(msg.getTable());
+//        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
+        System.out.println("[Received]" + msg.singleLineDisplayStr());
         switch (msg.getType()) {
             case Message.Type.QUERY:
                 boolean isPublish = msg.getKey().equals("PUBLISH");
@@ -135,8 +137,6 @@ public class ProtocolHandler implements RobotProtocol {
                 // TODO: Something here.
                 break;
         }
-        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
-        System.out.println("Received:\n" + msg.displayStr());
     }
 
     public void setInternalHandler(final InternalTableHandler handler) {

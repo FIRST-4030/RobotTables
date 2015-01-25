@@ -90,6 +90,10 @@ public class Message {
         return "\tTable: " + getTable() + " [Type: " + getType() + "]\n" + "\t" + getKey() + " => " + getValue();
     }
 
+    public String singleLineDisplayStr() {
+        return "[Table: " + getTable() + "][Type:" + getType() + "][Key:" + getKey() + "] " + getValue();
+    }
+
     public int getType() {
         return type;
     }
