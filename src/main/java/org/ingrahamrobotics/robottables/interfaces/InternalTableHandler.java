@@ -26,5 +26,5 @@ public interface InternalTableHandler extends RobotTablesClient {
 
     public void externalAdminKeyRemoved(String tableName, String key);
 
-    public TableType getTableType(String tableName);
+    public ProtocolTable getTable(String tableName);
 }

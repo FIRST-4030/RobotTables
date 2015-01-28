@@ -58,6 +58,11 @@ public class ProtocolHandler implements RobotProtocol {
         sendMessage(new Message(Message.Type.UPDATE, table.getName(), "END", Integer.toString(userValues.size() + adminValues.size())));
     }
 
+    public void sendFullUpdateRequest(final String tableName) {
+        // TODO: Should there be any key/value values in a REQUEST message?
+        sendMessage(new Message(Message.Type.REQUEST, tableName, "_", "_"));
+    }
+
     public void sendKeyUpdate(final String tableName, final String key, final String value) {
         sendMessage(new Message(Message.Type.PUBLISH_USER, tableName, key, value));
     }
@@ -87,7 +92,8 @@ public class ProtocolHandler implements RobotProtocol {
 
     public void dispatch(final Message msg) {
         // Message received, perform action
-        TableType tableType = handler.getTableType(msg.getTable());
+        ProtocolTable table = handler.getTable(msg.getTable());
+        TableType tableType = table.getType();
 //        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
         System.out.println("[Received]" + msg.singleLineDisplayStr());
         switch (msg.getType()) {
@@ -107,12 +113,21 @@ public class ProtocolHandler implements RobotProtocol {
                 break;
             case Message.Type.ACK:
                 if (msg.getKey().equals("GENERATION_COUNT") && tableType == TableType.LOCAL) {
-                    // TODO: Something should happen here
+                    // TODO: We should use the GENERATION_COUNT value in this message, and use generation count for stale as well as time.
+                    table.subscriberRepliedNow();
                 } else if (msg.getKey().equals("EXISTS")) {
                     if (tableType == null) {
                         handler.externalPublishedTable(msg.getTable()); // We didn't know this existed before, now we do.
                     } else if (tableType == TableType.LOCAL) {
+                        handler.externalPublishedTable(msg.getTable());
                         // TODO: Something should happen here
+                    } else { // Table is remote
+                        if (table.getLastUpdateTime() == -1) {
+                            // If we were unsure if this existed on the network
+                            table.existenceConfirmed();
+
+                        }
+                        // TODO: Do we want to do something else here?
                     }
                 }
                 break;
@@ -134,7 +149,8 @@ public class ProtocolHandler implements RobotProtocol {
                 handler.externalKeyRemoved(msg.getTable(), msg.getKey());
                 break;
             case Message.Type.REQUEST:
-                // TODO: Something here.
+                // TODO: Should we rate limit this in some way?
+                sendFullUpdate(table);
                 break;
         }
     }

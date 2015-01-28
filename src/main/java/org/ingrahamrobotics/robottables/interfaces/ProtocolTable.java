@@ -9,7 +9,20 @@ public interface ProtocolTable extends RobotTable {
 
     public boolean isReadyToPublish();
 
+    /**
+     * This remote table has just been updated.
+     */
     public void updatedNow();
+
+    /**
+     * A subscriber of this local table has just replied
+     */
+    public void subscriberRepliedNow();
+
+    /**
+     * The existence of this remote table on a network has been confirmed.
+     */
+    public void existenceConfirmed();
 
     /**
      * Gets the internal HashMap of user key->value entries.
