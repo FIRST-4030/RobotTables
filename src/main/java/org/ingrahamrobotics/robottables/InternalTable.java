@@ -22,7 +22,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     private long lastUpdate = -1; // -1 for not confirmed existing on network. 0 for confirmed existing on network, but never updated.
     /**
      * Last time a subscriber replied to a table update message.
-     * <p/>
+     * <p>
      * TODO: Handle subsriber last generation count for stale as well, not only time.
      */
     private long lastSubscriberReply;

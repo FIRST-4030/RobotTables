@@ -125,7 +125,6 @@ public class ProtocolHandler implements RobotProtocol {
                         if (table.getLastUpdateTime() == -1) {
                             // If we were unsure if this existed on the network
                             table.existenceConfirmed();
-
                         }
                         // TODO: Do we want to do something else here?
                     }

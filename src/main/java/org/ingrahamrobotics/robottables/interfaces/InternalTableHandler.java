@@ -2,7 +2,6 @@ package org.ingrahamrobotics.robottables.interfaces;
 
 import org.ingrahamrobotics.robottables.InternalTable;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
-import org.ingrahamrobotics.robottables.api.TableType;
 
 public interface InternalTableHandler extends RobotTablesClient {
 
