@@ -80,8 +80,9 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendMessage(final Message message) {
-        System.out.println("[Raw] Sending: " + message.toString().replace("\0", "\\0"));
-        System.out.println("Sending:\n" + message.displayStr());
+//        System.out.println("[Raw] Sending: " + message.toString().replace("\0", "\\0"));
+//        System.out.println("Sending:\n" + message.displayStr());
+        System.out.println("[Sending] " + message.singleLineDisplayStr());
         try {
             io.send(message.toString());
         } catch (IOException e) {
@@ -97,7 +98,7 @@ public class ProtocolHandler implements RobotProtocol {
 //        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
         System.out.println("[Received]" + msg.singleLineDisplayStr());
         switch (msg.getType()) {
-            case Message.Type.QUERY:
+            case QUERY:
                 boolean isPublish = msg.getKey().equals("PUBLISH");
                 if (!isPublish && !msg.getKey().equals("EXISTS")) {
                     System.err.println("Invalid message received: " + msg.displayStr());
@@ -111,7 +112,7 @@ public class ProtocolHandler implements RobotProtocol {
                     handler.externalPublishedTable(msg.getTable());
                 }
                 break;
-            case Message.Type.ACK:
+            case ACK:
                 if (msg.getKey().equals("GENERATION_COUNT") && tableType == TableType.LOCAL) {
                     // TODO: We should use the GENERATION_COUNT value in this message, and use generation count for stale as well as time.
                     table.subscriberRepliedNow();
@@ -130,24 +131,24 @@ public class ProtocolHandler implements RobotProtocol {
                     }
                 }
                 break;
-            case Message.Type.NAK:
+            case NAK:
                 if (tableType == TableType.LOCAL || tableType == null) {
                     handler.externalPublishedTable(msg.getTable());
                 }
                 break;
-            case Message.Type.PUBLISH_ADMIN:
+            case PUBLISH_ADMIN:
                 handler.externalAdminKeyUpdated(msg.getTable(), msg.getKey(), msg.getValue());
                 break;
-            case Message.Type.DELETE_ADMIN:
+            case DELETE_ADMIN:
                 handler.externalAdminKeyRemoved(msg.getTable(), msg.getKey());
                 break;
-            case Message.Type.PUBLISH_USER:
+            case PUBLISH_USER:
                 handler.externalKeyUpdated(msg.getTable(), msg.getKey(), msg.getValue());
                 break;
-            case Message.Type.DELETE_USER:
+            case DELETE_USER:
                 handler.externalKeyRemoved(msg.getTable(), msg.getKey());
                 break;
-            case Message.Type.REQUEST:
+            case REQUEST:
                 // TODO: Should we rate limit this in some way?
                 sendFullUpdate(table);
                 break;
