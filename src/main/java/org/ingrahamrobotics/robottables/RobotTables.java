@@ -14,32 +14,28 @@ public class RobotTables implements QueueEvents {
     private ProtocolHandler protocolHandler;
     private TablesInterfaceHandler tablesInterfaceHandler;
 
-    public void run(String targetAddress) {
+    public void run(String targetAddress) throws IOException {
         // Message queue between listener and dispatch
         Queue queue = new Queue(this);
 
-        try {
-            io = new IO(targetAddress);
+        io = new IO(targetAddress);
 
-            // Listen for and queue incoming messages
-            io.listen(queue);
+        // Listen for and queue incoming messages
+        io.listen(queue);
 
-            dispatch = new Dispatch(queue);
+        dispatch = new Dispatch(queue);
 
-            protocolHandler = new ProtocolHandler(io);
+        protocolHandler = new ProtocolHandler(io);
 
-            // Dispatch all messages from the queue to the protocol handler
-            dispatch.setAllHandlers(protocolHandler);
+        // Dispatch all messages from the queue to the protocol handler
+        dispatch.setAllHandlers(protocolHandler);
 
-            tablesInterfaceHandler = new TablesInterfaceHandler(protocolHandler);
+        tablesInterfaceHandler = new TablesInterfaceHandler(protocolHandler);
 
-            // Set the internal handler on the protocol handler
-            protocolHandler.setInternalHandler(tablesInterfaceHandler);
+        // Set the internal handler on the protocol handler
+        protocolHandler.setInternalHandler(tablesInterfaceHandler);
 
-            (new Thread(dispatch)).start();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        (new Thread(dispatch)).start();
     }
 
     public void queueError(int size, boolean draining, int targetSize) {
