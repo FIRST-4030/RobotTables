@@ -77,7 +77,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return String.valueOf(type) + DELIMITER + table + DELIMITER + key + DELIMITER + value;
+        return Integer.toString(type.networkValue) + DELIMITER + table + DELIMITER + key + DELIMITER + value;
     }
 
     private void parse(String raw) {
