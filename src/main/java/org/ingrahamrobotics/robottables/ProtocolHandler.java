@@ -94,7 +94,7 @@ public class ProtocolHandler implements RobotProtocol {
     public void dispatch(final Message msg) {
         // Message received, perform action
         ProtocolTable table = handler.getTable(msg.getTable());
-        TableType tableType = table.getType();
+        TableType tableType = table == null ? null : table.getType();
 //        System.out.println("[Raw] Received: " + msg.toString().replace("\0", "\\0"));
         System.out.println("[Received]" + msg.singleLineDisplayStr());
         switch (msg.getType()) {
