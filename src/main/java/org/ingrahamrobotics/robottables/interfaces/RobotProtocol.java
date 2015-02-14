@@ -19,6 +19,13 @@ public interface RobotProtocol extends DistpachEvents {
     public void sendFullUpdate(ProtocolTable table);
 
     /**
+     * Asks if any remote publishers are publishing this table.
+     *
+     * @param tableName The remote table name
+     */
+    public void sendExistsQuestionRequest(final String tableName);
+
+    /**
      * Asks the remote publisher of this table to send a full update
      *
      * @param tableName The remote table name

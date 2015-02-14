@@ -167,6 +167,7 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         InternalTable table = tableMap.get(tableName);
         if (table == null) {
             table = new InternalTable(this, tableName, TableType.REMOTE);
+            protocolHandler.sendExistsQuestionRequest(tableName);
         }
         return table;
     }
