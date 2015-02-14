@@ -51,7 +51,7 @@ public class ProtocolHandler implements RobotProtocol {
         List<Map.Entry<String, String>> adminValues = new ArrayList<Map.Entry<String, String>>(table.getAdminValues().entrySet());
 
         sendMessage(new Message(Message.Type.UPDATE, table.getName(), "ADMIN", Integer.toString(adminValues.size())));
-        for (Map.Entry<String, String> entry : userValues) {
+        for (Map.Entry<String, String> entry : adminValues) {
             sendAdminKeyUpdate(table.getName(), entry.getKey(), entry.getValue());
         }
 
