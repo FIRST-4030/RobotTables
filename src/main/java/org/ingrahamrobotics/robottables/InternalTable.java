@@ -95,6 +95,17 @@ public class InternalTable implements RobotTable, ProtocolTable {
             listeners.add(listener);
         }
     }
+    public void addUpdateListener(final TableUpdateListener listener, boolean initialUpdate) {
+        addUpdateListener(listener);
+        if (initialUpdate) {
+            for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                listener.onUpdate(this, entry.getKey(), entry.getValue(), UpdateAction.NEW);
+            }
+            for (Map.Entry<String, String> entry : adminMap.entrySet()) {
+                listener.onUpdateAdmin(this, entry.getKey(), entry.getValue(), UpdateAction.NEW);
+            }
+        }
+    }
 
     public void remoteUpdateListener(final TableUpdateListener listener) {
         listeners.remove(listener);

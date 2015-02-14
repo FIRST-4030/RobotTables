@@ -178,6 +178,15 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         }
     }
 
+    public void addClientListener(final ClientUpdateListener listener, boolean initialUpdate) {
+        addClientListener(listener);
+        if (initialUpdate) {
+            for (RobotTable table : tableMap.values()) {
+                listener.onNewTable(table);
+            }
+        }
+    }
+
     public void removeClientListener(final ClientUpdateListener listener) {
         listeners.remove(listener);
     }
