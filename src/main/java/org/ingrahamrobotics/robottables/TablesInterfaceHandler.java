@@ -18,7 +18,6 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
     private final Map<String, InternalTable> tableMap = new HashMap<String, InternalTable>(); // Map from String to InternalTable
     private final List<ClientUpdateListener> listeners = new ArrayList<ClientUpdateListener>(); // List of ClientUpdateListener
     private final RobotProtocol protocolHandler;
-    private final Timer timer = new Timer();
 
     public TablesInterfaceHandler(final RobotProtocol handler) {
         protocolHandler = handler;
@@ -143,21 +142,10 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
         InternalTable table = tableMap.get(tableName);
         if (table == null) {
             // If we don't know about this table yet, publish it
-            protocolHandler.sendPublishRequest(tableName);
             table = new InternalTable(this, tableName, TableType.LOCAL);
             tableMap.put(tableName, table);
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    InternalTable table = tableMap.get(tableName);
-                    if (table == null) {
-                        System.err.println("Warning: Table '" + tableName + "' used to exist, but doesn't anymore.");
-                    } else {
-                        table.setReadyToPublish(true);
-                        protocolHandler.sendFullUpdate(table);
-                    }
-                }
-            }, TimeConstants.PUBLISH_WAIT_TIME);
+
+            protocolHandler.sendPublishRequestAndStartTimer(table);
         }
         // Return the table we had before, or published
         return table;

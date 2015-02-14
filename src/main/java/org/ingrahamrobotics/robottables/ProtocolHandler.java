@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.interfaces.InternalTableHandler;
 import org.ingrahamrobotics.robottables.interfaces.ProtocolTable;
@@ -13,14 +15,25 @@ import org.ingrahamrobotics.robottables.network.IO;
 public class ProtocolHandler implements RobotProtocol {
 
     private InternalTableHandler handler;
+    private final Timer timer = new Timer();
     private final IO io;
 
     public ProtocolHandler(IO io) throws IOException {
         this.io = io;
     }
 
-    public void sendPublishRequest(final String tableName) {
-        sendMessage(new Message(Message.Type.QUERY, tableName, "PUBLISH", "_"));
+    public void sendPublishRequestAndStartTimer(final ProtocolTable table) {
+        sendMessage(new Message(Message.Type.QUERY, table.getName(), "PUBLISH", "_"));
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (table.getType() == TableType.LOCAL) {
+                    table.setReadyToPublish(true);
+                    sendFullUpdate(table);
+                }
+            }
+        }, TimeConstants.PUBLISH_WAIT_TIME);
     }
 
     public void sendFullUpdate(final ProtocolTable table) {
