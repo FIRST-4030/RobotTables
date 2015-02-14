@@ -15,12 +15,9 @@ public class Message {
         PUBLISH_USER(6),
         DELETE_USER(7),
         UPDATE(8),
-        REQUEST(9),
-        // REQUEST
-        HIGHEST(9),
-        // QUERY
-        LOWEST(1);
-
+        REQUEST(9);
+        public static final Type HIGHEST = REQUEST;
+        public static final Type LOWEST = QUERY;
         private static final Map<Integer, Type> intToType = new HashMap<Integer, Type>();
 
         public final int networkValue;
