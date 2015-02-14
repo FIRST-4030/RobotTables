@@ -59,7 +59,7 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendExistsQuestionRequest(final String tableName) {
-        sendMessage(new Message(Message.Type.REQUEST, tableName, "EXISTS", "_"));
+        sendMessage(new Message(Message.Type.QUERY, tableName, "EXISTS", "_"));
     }
 
     public void sendFullUpdateRequest(final String tableName) {
