@@ -167,7 +167,9 @@ public class ProtocolHandler implements RobotProtocol {
                 break;
             case REQUEST:
                 // TODO: Should we rate limit this in some way?
-                sendFullUpdate(table);
+                if (tableType == TableType.LOCAL) {
+                    sendFullUpdate(table);
+                }
                 break;
         }
     }
