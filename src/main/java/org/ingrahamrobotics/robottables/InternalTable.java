@@ -1,6 +1,7 @@
 package org.ingrahamrobotics.robottables;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,6 +253,14 @@ public class InternalTable implements RobotTable, ProtocolTable {
 
     public boolean containsAdmin(final String key) {
         return adminMap.containsKey(key);
+    }
+
+    public List<String> getKeys() {
+        if (valueMap.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return new ArrayList<String>(valueMap.keySet());
+        }
     }
 
     public void clear() {
