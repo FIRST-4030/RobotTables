@@ -76,7 +76,6 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendFullUpdateRequest(final String tableName) {
-        // TODO: Should there be any key/value values in a REQUEST message?
         sendMessage(new Message(Message.Type.REQUEST, tableName, "_", "_"));
     }
 
@@ -97,8 +96,6 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendMessage(final Message message) {
-//        System.out.println("[Raw] Sending: " + message.toString().replace("\0", "\\0"));
-//        System.out.println("Sending:\n" + message.displayStr());
         System.out.println("[Sending] " + message.singleLineDisplayStr());
         try {
             io.send(message.toString());
@@ -125,7 +122,7 @@ public class ProtocolHandler implements RobotProtocol {
                     // Currently we won't send externalPublishedTable if we know the table is remote already,
                     // perhaps we should change this? In the current setup, the table is only reset when the new
                     // published sends the first full update.
-                    newRemoteTableResponse(msg.getTable());
+                    handler.externalPublishedTable(msg.getTable());
                 }
                 break;
             case ACK:
@@ -149,7 +146,7 @@ public class ProtocolHandler implements RobotProtocol {
                 }
                 break;
             case NAK:
-                if (tableType == TableType.LOCAL || tableType == null) {
+                if (tableType != TableType.REMOTE) {
                     newRemoteTableResponse(msg.getTable());
                 }
                 break;
@@ -185,6 +182,8 @@ public class ProtocolHandler implements RobotProtocol {
                     sendFullUpdate(table);
                 }
                 break;
+            default:
+                System.out.println("Warning! Unhandled message!");
         }
     }
 

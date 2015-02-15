@@ -195,6 +195,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     public boolean isInt(final String key) {
         String str = valueMap.get(key);
         try {
+            //noinspection ResultOfMethodCallIgnored
             Integer.parseInt(str);
             return true;
         } catch (NumberFormatException ex) {
@@ -205,6 +206,7 @@ public class InternalTable implements RobotTable, ProtocolTable {
     public boolean isDouble(final String key) {
         String str = valueMap.get(key);
         try {
+            //noinspection ResultOfMethodCallIgnored
             Double.parseDouble(str);
             return true;
         } catch (NumberFormatException ex) {
@@ -272,6 +274,30 @@ public class InternalTable implements RobotTable, ProtocolTable {
             return Collections.emptyList();
         } else {
             return new ArrayList<String>(valueMap.keySet());
+        }
+    }
+
+    public Set<String> getKeySet() {
+        if (valueMap.isEmpty()) {
+            return Collections.emptySet();
+        } else {
+            return Collections.unmodifiableSet(valueMap.keySet());
+        }
+    }
+
+    public List<String> getAdminKeys() {
+        if (adminMap.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return new ArrayList<String>(adminMap.keySet());
+        }
+    }
+
+    public Set<String> getAdminKeySet() {
+        if (adminMap.isEmpty()) {
+            return Collections.emptySet();
+        } else {
+            return Collections.unmodifiableSet(adminMap.keySet());
         }
     }
 
