@@ -29,7 +29,7 @@ public class ProtocolHandler implements RobotProtocol {
             @Override
             public void run() {
                 if (table.getType() == TableType.LOCAL) {
-                    table.setReadyToPublish(true);
+                    table.getProtocolData().setReadyToPublish(true);
                     sendFullUpdate(table);
                 }
             }
@@ -37,6 +37,7 @@ public class ProtocolHandler implements RobotProtocol {
     }
 
     public void sendFullUpdate(final ProtocolTable table) {
+        table.getProtocolData().getFullUpdateRunnable().delayUntil(System.currentTimeMillis() + TimeConstants.UPDATE_INTERVAL);
         int generationCount;
         String generationString = table.getAdmin("GENERATION_COUNT");
         if (generationString == null) {
@@ -77,6 +78,10 @@ public class ProtocolHandler implements RobotProtocol {
 
     public void sendFullUpdateRequest(final String tableName) {
         sendMessage(new Message(Message.Type.REQUEST, tableName, "_", "_"));
+    }
+
+    public void sendFullUpdateSuccessConfirmation(final ProtocolTable table) {
+        sendMessage(new Message(Message.Type.ACK, table.getName(), "GENERATION_COUNT", table.getAdmin("GENERATION_COUNT")));
     }
 
     public void sendKeyUpdate(final String tableName, final String key, final String value) {
@@ -180,6 +185,30 @@ public class ProtocolHandler implements RobotProtocol {
                 // TODO: Should we rate limit this in some way?
                 if (tableType == TableType.LOCAL) {
                     sendFullUpdate(table);
+                }
+                break;
+            case UPDATE:
+                if (tableType != TableType.REMOTE) {
+                    handler.externalPublishedTable(msg.getTable());
+                    table = handler.getTable(msg.getTable());
+                }
+                int keyCount;
+                try {
+                    keyCount = Integer.parseInt(msg.getValue());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    System.out.printf("Warning! UPDATE message received with invalid non-integer value: %s%n", msg.getValue());
+                    return;
+                }
+                ProtocolTableData tableData = table.getProtocolData();
+                if (msg.getKey().equals("USER")) {
+                    tableData.userUpdateStarted(keyCount);
+                } else if (msg.getKey().equals("ADMIN")) {
+                    tableData.adminUpdateStarted(keyCount);
+                } else if (msg.getKey().equals("END")) {
+                    tableData.endMessageReceived(keyCount);
+                } else {
+                    System.out.printf("Warning! UPDATE message received with invalid value: %s%n", msg.getKey());
                 }
                 break;
             default:
