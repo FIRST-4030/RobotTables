@@ -1,6 +1,8 @@
 package org.ingrahamrobotics.robottables;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +146,10 @@ public class TablesInterfaceHandler implements RobotTablesClient, InternalTableH
 
     public InternalTable getTable(final String tableName) {
         return tableMap.get(tableName);
+    }
+
+    public Collection<? extends RobotTable> getTableSet() {
+        return Collections.unmodifiableCollection(tableMap.values());
     }
 
     public RobotProtocol getProtocolHandler() {
