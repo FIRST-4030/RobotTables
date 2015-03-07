@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class IO {
 
     private static final int COMMUNICATIONS_PORT = 5805;
+    public static final String INSTANCE_UNIQUE = UUID.randomUUID().toString();
 
     private ListenEvents eventClass;
     private List<Socket> sockets;
