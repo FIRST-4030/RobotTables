@@ -16,8 +16,8 @@ public class RobotTables implements QueueEvents {
     private final TablesInterfaceHandler tablesInterfaceHandler;
     private Dispatch dispatch;
 
-    public RobotTables(List<InetAddress> targetAddresses) throws IOException {
-        io = new IO(targetAddresses);
+    public RobotTables() throws IOException {
+        io = new IO();
         protocolHandler = new ProtocolHandler(io);
         tablesInterfaceHandler = new TablesInterfaceHandler(protocolHandler);
         // Set the internal handler on the protocol handler
