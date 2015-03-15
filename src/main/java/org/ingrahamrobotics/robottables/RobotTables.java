@@ -1,8 +1,6 @@
 package org.ingrahamrobotics.robottables;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.List;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.network.IO;
 import org.ingrahamrobotics.robottables.network.Queue;
