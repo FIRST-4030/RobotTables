@@ -66,12 +66,12 @@ Other administrative keys may be ignored, if not used for implementation-specifi
 ## Required Timers
 
 ### PublisherStale
-Subscribers must trigger the PublisherStale event if 2.1 times the UPDATE_INTERVAL has elapsed since the last successful Table Update process.
+Subscribers must trigger the PublisherStale event if 1.7 (was 2.1) times the UPDATE_INTERVAL has elapsed since the last successful Table Update process.
 
 Publishers set the UPDATE_INTERVAL administrative key and must initiate a Table Update process at least as frequently as that interval.
 
 ### SubscriberStale
-Publishers must trigger the SubscriberStale event if the last Table Update ACK is more than 2 generations out-of-date, or if 2.1 times the UPDATE_INTERVAL has elapsed since the last valid Table Update ACK.
+Publishers must trigger the SubscriberStale event if the last Table Update ACK is more than 2 generations out-of-date, or if 1.7 (was 2.1) times the UPDATE_INTERVAL has elapsed since the last valid Table Update ACK.
 
 ## Subscriber Events
 ### AdminChanged(Table, Key)
