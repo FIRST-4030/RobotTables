@@ -35,6 +35,14 @@
             <id>repo-daboross</id>
             <url>http://repo.daboross.net/</url>
         </repository>
+        <repository>
+            <id>repo-daboross-net-backup-releases</id>
+            <url>http://repo.daboross.net/releases/</url>
+        </repository>
+        <repository>
+            <id>repo-daboross-net-backup-snapshots</id>
+            <url>http://repo.daboross.net/snapshots/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
