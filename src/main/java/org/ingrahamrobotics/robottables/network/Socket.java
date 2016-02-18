@@ -33,7 +33,7 @@ public class Socket {
     }
 
     public boolean isOpen() {
-        return (conn != null);
+        return (conn != null && conn.isBound());
     }
 
     private void throwIfClosed() throws IOException {
